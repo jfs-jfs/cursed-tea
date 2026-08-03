@@ -1,0 +1,11 @@
+prefix=@PREFIX@
+exec_prefix=${prefix}
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: cursed-tea
+Description: TEA-style TUI framework core (ncurses)
+Version: @VERSION@
+Requires: ncursesw
+Libs: -L${libdir} -lcursed-tea -lm -pthread
+Cflags: -I${includedir}

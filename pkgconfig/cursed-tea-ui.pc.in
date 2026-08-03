@@ -1,0 +1,11 @@
+prefix=@PREFIX@
+exec_prefix=${prefix}
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: cursed-tea-ui
+Description: Optional UI widgets for cursed-tea
+Version: @VERSION@
+Requires: cursed-tea
+Libs: -L${libdir} -lcursed-tea-ui
+Cflags: -I${includedir}

@@ -1,0 +1,119 @@
+#include <assert.h>
+#include <cursed-tea/application.h>
+#include <cursed-tea/canvas.h>
+#include <cursed-tea/core.h>
+#include <cursed-tea/event.h>
+#include <cursed-tea/logger.h>
+#include <cursed-tea/style/brush.h>
+#include <ncurses.h>
+#include <stddef.h>
+#include <time.h>
+#include <wchar.h>
+
+#define EVENT_POLLING_DELAY_MS 10
+
+void _system_init();
+void _system_cleanup();
+
+void _sleep_ms(long ms) {
+  struct timespec ts;
+  ts.tv_sec = ms / 1000;
+  ts.tv_nsec = (ms % 1000) * 1000000L;
+  nanosleep(&ts, NULL);
+}
+
+void ct_app_init() { _system_init(); }
+
+void ct_app_start(struct CtModel *root) {
+  assert(NULL != root);
+
+  // _system_init(); // Now called on ct_app_init
+
+  wchar_t pressed_key;
+
+  bool should_exit = false;
+
+  log_info(L"Starting main loop");
+  while (!should_exit) {
+    // Poll Events first always starts with events
+    timeout(EVENT_POLLING_DELAY_MS);
+    while (0 == ct_event_count()) {
+      int rc = get_wch(&pressed_key);
+      if (rc == OK || rc == KEY_CODE_YES) {
+        if (pressed_key != KEY_RESIZE)
+          ct_event_send_key(pressed_key);
+        else {
+          resize_term(0, 0);
+          int max_x, max_y;
+          getmaxyx(stdscr, max_y, max_x);
+          ct_main_canvas_resize(max_x, max_y);
+          ct_event_send_resize(max_x, max_y);
+        };
+      }
+    }
+
+    // Consume events
+    while (0 != ct_event_count() && !should_exit) {
+      struct CtEvent *event = ct_event_next();
+      if (event->type == EXIT_EVENT) {
+        log_info(L"EXIT EVENT RECEIVED");
+        should_exit = true;
+        continue;
+      }
+
+      root->handler(root, event);
+      ct_event_consumed();
+    }
+
+    // Drawing pass
+    struct CtCanvas *canvas = ct_main_canvas();
+    ct_main_canvas_clear();
+    root->render(root, canvas);
+
+    for (size_t y = 0; y < canvas->max_y; y++)
+      mvadd_wchnstr(y, 0, canvas->cell_matrix[y], (int)canvas->max_x);
+    refresh();
+  }
+
+  root->cleanup(root);
+}
+
+void _system_init() {
+  ct_logger_setup();
+  ct_logger_file("cursed-tea.log", false);
+  ct_logger_level(LOG_TRACE);
+  log_info(L"logger setup done");
+
+  // Locale :: UNICODE
+  setlocale(LC_ALL, "");
+  log_info(L"unicode locale setup");
+
+  // Ncurses
+  initscr();
+  noecho();
+  cbreak();
+  keypad(stdscr, true);
+  curs_set(0);
+
+  // Color subsystem (truecolor if available)
+  ct_brush_setup();
+
+  // Register cleanup
+  atexit(_system_cleanup);
+
+  // Events ring
+  ct_events_setup();
+
+  // Main canvas setup
+  int max_x, max_y;
+  getmaxyx(stdscr, max_y, max_x);
+  ct_main_canvas_init(max_x, max_y);
+  ct_event_send_resize(max_x, max_y);
+}
+
+void _system_cleanup() {
+  log_trace();
+
+  // Ncurses
+  endwin();
+}

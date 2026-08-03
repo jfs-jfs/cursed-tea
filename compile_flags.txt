@@ -1,0 +1,6 @@
+-std=c11
+-Wall
+-Wextra
+-D_XOPEN_SOURCE=700
+-Iinclude
+-Isrc/core

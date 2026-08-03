@@ -1,0 +1,21 @@
+# Build outputs
+/build/
+/dist/
+*.o
+*.a
+*.so
+*.so.*
+
+# Example binaries
+/example_*
+/examples/example_*
+
+# Logs / local
+*.log
+cursed-tea.log
+
+# Editor / tooling
+compile_commands.json
+.cache/
+*.swp
+*~

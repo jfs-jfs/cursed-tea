@@ -1,5 +1,7 @@
 # cursed-tea
 
+!! Still in early development, use at your own risk !!
+
 A small **TEA-style** (The Elm Architecture) TUI framework on **ncursesw**, with optional UI widgets.
 
 License: **MIT**

@@ -97,8 +97,6 @@ void ct_ccutout(const struct CtCanvas *canvas, struct CtCanvas *cutout,
 
   for (size_t i = 0; i < cutout->max_y; i++)
     cutout->cell_matrix[i] = canvas->cell_matrix[i + start.y] + start.x;
-
-  ct_cfill(cutout, L' ');
 }
 
 void ct_ccutout_c(const struct CtCanvas *canvas, struct CtCanvas *cutout,

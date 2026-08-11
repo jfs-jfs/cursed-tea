@@ -1,5 +1,5 @@
-#include <cursed-tea/event.h>
 #include "fifo.h"
+#include <cursed-tea/event.h>
 #include <pthread.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -26,7 +26,9 @@ void ct_events_setup() {
 
 size_t ct_event_count() { return EVENTS_QUEUE.count; }
 
-struct CtEvent *ct_event_next() { return (struct CtEvent *)ct_fifo_next(&EVENTS_QUEUE); }
+struct CtEvent *ct_event_next() {
+  return (struct CtEvent *)ct_fifo_next(&EVENTS_QUEUE);
+}
 void ct_event_consumed() { ct_fifo_pop(&EVENTS_QUEUE); }
 
 void ct_event_send_custom(const int signal, void *data) {
@@ -62,15 +64,15 @@ void *_send_delayed(void *delayed_event) {
 }
 
 void ct_event_send_custom_delayed(const int signal, const long delay_ms,
-                               void *data) {
+                                  void *data) {
   pthread_t new_thread;
   struct CtDelayedEvent *devent = malloc(sizeof(struct CtDelayedEvent));
   devent->event.type = CUSTOM_EVENT;
   devent->event.custom_signal = signal;
   devent->event.data = data;
   devent->delay_ms = delay_ms;
-  pthread_t thread = pthread_create(&new_thread, NULL, _send_delayed, devent);
-  pthread_detach(thread);
+  pthread_create(&new_thread, NULL, _send_delayed, devent);
+  pthread_detach(new_thread);
 }
 
 void _events_cleanup() { ct_fifo_cleanup(&EVENTS_QUEUE); }

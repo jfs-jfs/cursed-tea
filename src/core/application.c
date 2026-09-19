@@ -7,13 +7,37 @@
 #include <cursed-tea/style/brush.h>
 #include <ncurses.h>
 #include <stddef.h>
+#include <sys/ioctl.h>
+#include <termios.h>
 #include <time.h>
+#include <unistd.h>
 #include <wchar.h>
 
 #define EVENT_POLLING_DELAY_MS 10
 
 void _system_init();
 void _system_cleanup();
+
+// Reads the real terminal size via TIOCGWINSZ on stdout. Unlike ncurses'
+// cached LINES/COLS (which only refresh on a resize), this always reflects
+// the authentic PTY dimensions, so the UI converges even when SIGWINCH
+// delivery to the process cannot be relied upon (e.g. over SSH).
+static bool _terminal_size(size_t *out_x, size_t *out_y) {
+  struct winsize ws;
+  if (ioctl(fileno(stdout), TIOCGWINSZ, &ws) != 0)
+    return false;
+  *out_x = ws.ws_col;
+  *out_y = ws.ws_row;
+  return true;
+}
+
+static void _apply_resize() {
+  resize_term(0, 0);
+  int max_x, max_y;
+  getmaxyx(stdscr, max_y, max_x);
+  ct_main_canvas_resize(max_x, max_y);
+  ct_event_send_resize(max_x, max_y);
+}
 
 void _sleep_ms(long ms) {
   struct timespec ts;
@@ -35,6 +59,18 @@ void ct_app_start(struct CtModel *root) {
 
   log_info(L"Starting main loop");
   while (!should_exit) {
+    // Poll the real terminal size each frame. SIGWINCH/KEY_RESIZE may be
+    // unreliable or arrive out of order on some transports (notably SSH),
+    // so compare against the authoritative PTY size and resize on change.
+    {
+      size_t term_x, term_y;
+      if (_terminal_size(&term_x, &term_y) && term_x > 0 && term_y > 0) {
+        struct CtCanvas *c = ct_main_canvas();
+        if (c->max_x != term_x || c->max_y != term_y)
+          _apply_resize();
+      }
+    }
+
     // Poll Events first always starts with events
     timeout(EVENT_POLLING_DELAY_MS);
     while (0 == ct_event_count()) {
@@ -42,13 +78,8 @@ void ct_app_start(struct CtModel *root) {
       if (rc == OK || rc == KEY_CODE_YES) {
         if (pressed_key != KEY_RESIZE)
           ct_event_send_key(pressed_key);
-        else {
-          resize_term(0, 0);
-          int max_x, max_y;
-          getmaxyx(stdscr, max_y, max_x);
-          ct_main_canvas_resize(max_x, max_y);
-          ct_event_send_resize(max_x, max_y);
-        };
+        else
+          _apply_resize();
       }
     }
 

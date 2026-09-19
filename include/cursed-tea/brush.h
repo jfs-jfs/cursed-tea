@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cursed-tea/style/border.h>
+#include <cursed-tea/border.h>
 #include <ncurses.h>
 #include <stdbool.h>
 #include <stdint.h>

@@ -2,7 +2,6 @@
 #include <cursed-tea/canvas-write.h>
 #include <cursed-tea/logger.h>
 #include <cursed-tea/uvector.h>
-#include <math.h>
 #include <stddef.h>
 
 void ct_cwrite_char(struct CtCanvas *canvas, const size_t x, const size_t y,
@@ -24,7 +23,7 @@ void _ct_cwrite_char_rec(struct CtCanvas *canvas, const CtUVector from,
   }
 
   size_t smallest_idx = 0;
-  size_t smallest_distance = MAXFLOAT;
+  size_t smallest_distance = -1;
   float distances[] = {.0, .0, .0, .0};
   CtUVector directions[] = {
       {from.x + 1, from.y},

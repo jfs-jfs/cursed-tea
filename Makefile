@@ -14,7 +14,7 @@ CC       ?= cc
 AR       ?= ar
 ARFLAGS  ?= rcs
 CFLAGS   ?= -O2 -g
-CFLAGS   += -std=c11 -Wall -Wextra -Iinclude -Isrc/core
+CFLAGS   += -std=c11 -Wall -Wextra -Iinclude -Isrc
 # Feature macros come from ncursesw.pc (_DEFAULT_SOURCE / _XOPEN_SOURCE)
 CFLAGS   += $(shell pkg-config --cflags ncursesw 2>/dev/null)
 LDFLAGS  ?=

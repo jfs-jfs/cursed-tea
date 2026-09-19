@@ -1,7 +1,6 @@
+#include <cursed-tea/border.h>
+#include <cursed-tea/brush.h>
 #include <cursed-tea/logger.h>
-#include <cursed-tea/style/border.h>
-#include <cursed-tea/style/brush.h>
-#include <cursed-tea/ui/common.h>
 #include <limits.h>
 #include <ncurses.h>
 #include <stdbool.h>

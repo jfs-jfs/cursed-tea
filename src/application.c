@@ -1,10 +1,5 @@
 #include <assert.h>
-#include <cursed-tea/application.h>
-#include <cursed-tea/canvas.h>
-#include <cursed-tea/core.h>
-#include <cursed-tea/event.h>
-#include <cursed-tea/logger.h>
-#include <cursed-tea/style/brush.h>
+#include <cursed-tea.h>
 #include <ncurses.h>
 #include <stddef.h>
 #include <sys/ioctl.h>

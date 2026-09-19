@@ -1,8 +1,8 @@
+#include <assert.h>
+#include <cursed-tea/brush.h>
 #include <cursed-tea/canvas.h>
 #include <cursed-tea/layout.h>
 #include <cursed-tea/logger.h>
-#include <cursed-tea/style/brush.h>
-#include <assert.h>
 #include <ncurses.h>
 #include <stddef.h>
 #include <stdlib.h>

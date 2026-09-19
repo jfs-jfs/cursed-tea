@@ -1,6 +1,6 @@
+#include <cursed-tea/brush.h>
 #include <cursed-tea/canvas-write.h>
 #include <cursed-tea/logger.h>
-#include <cursed-tea/style/brush.h>
 #include <cursed-tea/uvector.h>
 #include <math.h>
 #include <stddef.h>

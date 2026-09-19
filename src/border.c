@@ -1,6 +1,6 @@
+#include <cursed-tea/border.h>
+#include <cursed-tea/brush.h>
 #include <cursed-tea/canvas-write.h>
-#include <cursed-tea/style/border.h>
-#include <cursed-tea/style/brush.h>
 #include <stddef.h>
 #include <string.h>
 
